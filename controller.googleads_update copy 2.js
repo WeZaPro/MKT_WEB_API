@@ -579,7 +579,7 @@ exports.getGoogleAdsKeywordTotal = async (req, res) => {
       sum_cost: item.cost,
     }));
 
-    // console.log("result ", result);
+    console.log("result ", result);
 
     const arr_data_imp = [];
     const arr_data_clicks = [];
@@ -596,8 +596,8 @@ exports.getGoogleAdsKeywordTotal = async (req, res) => {
       arr_data_conv.push(e.avg_conversions);
       arr_data_cost.push(e.sum_cost);
     });
-    // console.log("arr_label ", arr_label);
-    // console.log("arr_data_imp ", arr_data_imp);
+    console.log("arr_label ", arr_label);
+    console.log("arr_data_imp ", arr_data_imp);
 
     res.json({
       data: result,

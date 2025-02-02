@@ -282,36 +282,46 @@ app.post("/googleAdsDataReport", controllerGoogleAds.googleAdsDataReport);
 
 //update google ads
 // app.post("/googleAdsDataTable", controllerGoogleAds.googleAdsDataTable);
-//----
+//---ส่งข้อมูลจาก Google Ads -Start
 app.post(
   "/googleAdsDataCompany",
   controllerGoogleAds_update.googleAdsDataCompany
 );
-app.get(
-  "/googleAdsDataCompany",
-  controllerGoogleAds_update.getgoogleAdsDataCompany
-);
-//----
 app.post(
   "/googleAdsKeywordValue",
   controllerGoogleAds_update.googleAdsKeywordValue
 );
+//---ส่งข้อมูลจาก Google Ads -End
+app.get(
+  "/googleAdsDataCompany",
+  [authenticateToken],
+  controllerGoogleAds_update.getgoogleAdsDataCompany
+);
+//----
 app.get(
   "/googleAdsKeywordValue",
+  [authenticateToken],
   controllerGoogleAds_update.getGoogleAdsKeywordValue
 );
 //----
-app.get("/listCampaignsUpdate", controllerGoogleAds_update.listCampaignsUpdate);
+app.get(
+  "/listCampaignsUpdate",
+  [authenticateToken],
+  controllerGoogleAds_update.listCampaignsUpdate
+);
 app.post(
   "/googleAdsDataCompanyFilterCam",
+  [authenticateToken],
   controllerGoogleAds_update.getGoogleAdsDataCompanyFilterCam
 );
 app.post(
   "/getGoogleAdsKeywordValueFilterCam",
+  [authenticateToken],
   controllerGoogleAds_update.getGoogleAdsKeywordValueFilterCam
 );
 app.post(
   "/getGoogleAdsKeywordTotal",
+  [authenticateToken],
   controllerGoogleAds_update.getGoogleAdsKeywordTotal
 );
 
