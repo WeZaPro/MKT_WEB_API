@@ -1,0 +1,2 @@
+nvm use 17
+nvm alias default 17

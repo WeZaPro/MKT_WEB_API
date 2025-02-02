@@ -1,0 +1,94 @@
+function main() {
+  var apiUrl = "https://app.wezaapidev.com/googleAdsDataTable";  // เปลี่ยนเป็น IP ของ Server
+
+  // ดึงข้อมูลจากแคมเปญที่ยังไม่เปิดใช้งาน
+  var campaignIterator = AdsApp.campaigns()
+    .withCondition('Status = "PAUSED"') // Filter for PAUSED campaigns
+    .forDateRange('TODAY') // กำหนดช่วงเวลาล่าสุดที่ต้องการ
+    .get();
+  
+  while (campaignIterator.hasNext()) {
+    var campaign = campaignIterator.next();
+    var campaignName = campaign.getName(); // ชื่อแคมเปญ
+    var campaignStatus = campaign.isPaused() ? 'PAUSED' : 'Other'; // สถานะแคมเปญ
+    var campaignId = campaign.getId(); // ดึง Campaign ID
+
+    var adGroupIterator = campaign.adGroups().get();
+    
+    while (adGroupIterator.hasNext()) {
+      var adGroup = adGroupIterator.next();
+      var adGroupName = adGroup.getName(); // ชื่อกลุ่มโฆษณา
+      var adGroupStatus = adGroup.isPaused() ? 'PAUSED' : 'Other'; // สถานะของกลุ่มโฆษณา
+      var adGroupId = adGroup.getId(); // ดึง AdGroup ID
+
+      var adIterator = adGroup.ads().get();
+      
+      while (adIterator.hasNext()) {
+        var ad = adIterator.next();
+        var adId = ad.getId(); // ID ของโฆษณา
+        var adStatus = ad.isPaused() ? 'PAUSED' : 'Other'; // สถานะของโฆษณา
+        
+        var adHeadline = ad.getHeadline(); // หัวข้อโฆษณา
+        var adDescription = 'N/A'; // คำอธิบายโฆษณา
+        var adFinalUrl = 'N/A'; // URL สุดท้าย
+
+        // ดึงข้อมูลสำหรับสถิติ
+        var stats = ad.getStatsFor('TODAY'); // ดึงข้อมูลในช่วงวันนี้
+        var impressions = stats.getImpressions(); // จำนวนการแสดงผล
+        var clicks = stats.getClicks(); // จำนวนคลิก
+        var conversions = stats.getConversions(); // การแปลง
+        var cost = stats.getCost(); // ค่าใช้จ่าย
+
+        // คำนวณ CTR (Click-Through Rate)
+        var ctr = (impressions > 0) ? (clicks / impressions) * 100 : 0; // CTR เปอร์เซ็นต์
+
+        // คำนวณค่าอื่นๆ
+        var conversionRate = conversions / clicks;
+        var costPerConversion = cost / conversions;
+        
+        // กำหนดชื่อวันที่
+        var currentDate = new Date();
+        var formattedDate = currentDate.toISOString().split('T')[0]; // จัดรูปแบบวันที่ให้เป็น YYYY-MM-DD
+
+        // เตรียมข้อมูลเพื่อส่งไปยัง API
+       var payload = {
+          "CampaignName": [campaignName],
+          "CampaignId": [campaignId],
+          "AdGroupName": [adGroupName],
+          "AdGroupId": [adGroupId],
+          "AdId": [adId],
+          "Date": [formattedDate],
+          "AdStrength": ['Excellent'],
+          "Clicks": [clicks],
+          "Ctr": [ctr.toFixed(2) + '%'],
+          "ConvRate": [conversionRate],
+          "Impressions": [impressions],
+          "Cost": [cost],
+          "CostPerConv": [costPerConversion],
+          "Conversions": [conversions],
+          "ClickConversionRate": [conversionRate]
+};
+
+
+        // ตั้งค่า options สำหรับการส่งข้อมูลไป API
+        var options = {
+          method: "post",
+          contentType: "application/json",
+          payload: JSON.stringify(payload),
+          muteHttpExceptions: true
+          
+        };
+
+        // ส่งข้อมูลไปยัง API
+        try {
+          var response = UrlFetchApp.fetch(apiUrl, options);
+          Logger.log("Response from API: " + response.getContentText());
+          Logger.log("Payload sent: " + JSON.stringify(payload));
+
+        } catch (e) {
+          Logger.log("Error: " + e.message);
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,31 @@
+CREATE DATABASE IF NOT EXISTS PETIVERSE;
+
+
+
+
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(255) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    phone VARCHAR(255) NOT NULL,
+    status BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+
+
+CREATE TABLE IF NOT EXISTS register_data (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    course VARCHAR(255),
+    lineUserId VARCHAR(255),
+    displayName VARCHAR(255),
+    email VARCHAR(255),
+    phone VARCHAR(50),
+    name VARCHAR(255),
+    date DATETIME,
+    fileName VARCHAR(255),
+    fileUrl VARCHAR(255),
+    price DECIMAL(10, 2)
+);

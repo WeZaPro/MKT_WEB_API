@@ -1,0 +1,86 @@
+function main() {
+  var apiUrl = "https://app.wezaapidev.com/googleAdsDataCompany?company=A";  // เปลี่ยนเป็น IP ของ Server
+
+  // ดึงข้อมูลจากแคมเปญที่ถูกหยุดชั่วคราว
+  var campaignIterator = AdsApp.campaigns()
+    .withCondition('Status = "PAUSED"') // แสดงเฉพาะแคมเปญที่หยุดชั่วคราว
+    .forDateRange('TODAY') 
+    .get();
+  
+  while (campaignIterator.hasNext()) {
+    var campaign = campaignIterator.next();
+    var campaignName = campaign.getName();
+    var campaignId = campaign.getId();
+
+    var adGroupIterator = campaign.adGroups().get();
+    
+    while (adGroupIterator.hasNext()) {
+      var adGroup = adGroupIterator.next();
+      var adGroupName = adGroup.getName();
+      var adGroupId = adGroup.getId();
+
+      // ดึง Keyword ทั้งหมดของ AdGroup
+      var keywordIterator = adGroup.keywords().get();
+      var keywords = [];
+      
+      while (keywordIterator.hasNext()) {
+        var keyword = keywordIterator.next();
+        keywords.push(keyword.getText());  // ดึงข้อความของ Keyword
+      }
+
+      var adIterator = adGroup.ads().get();
+      
+      while (adIterator.hasNext()) {
+        var ad = adIterator.next();
+        var adId = ad.getId();
+        
+        var stats = ad.getStatsFor('TODAY');
+        var impressions = stats.getImpressions();
+        var clicks = stats.getClicks();
+        var conversions = stats.getConversions();
+        var cost = stats.getCost();
+
+        var ctr = (impressions > 0) ? (clicks / impressions) * 100 : 0;
+        var conversionRate = (clicks > 0) ? (conversions / clicks) : 0;
+        var costPerConversion = (conversions > 0) ? (cost / conversions) : 0;
+        
+        var adStrength = (ctr >= 5) ? 'Excellent' : (ctr >= 2) ? 'Good' : 'Poor';
+
+        var currentDate = new Date();
+        var formattedDate = currentDate.toISOString().split('T')[0];
+
+        // ** เพิ่ม Keyword ลงใน payload **
+       var payload = {
+          "CampaignName": [campaignName],
+          "CampaignId": [campaignId],
+          "AdGroupName": [adGroupName],
+          "AdGroupId": [adGroupId],
+          "Keywords": [keywords],  
+          "AdId": [adId],
+          "Date": [formattedDate],
+          "AdStrength": [adStrength],
+          "Clicks": [clicks],
+          "Ctr":[ ctr.toFixed(2) + '%'],
+          "ConvRate": [conversionRate],
+          "Impressions": [impressions],
+          "Cost": [cost],
+          "CostPerConv": [costPerConversion],
+          "Conversions": [conversions]
+        };
+        var options = {
+          method: "post",
+          contentType: "application/json",
+          payload: JSON.stringify(payload),
+          muteHttpExceptions: true
+        };
+
+        try {
+          var response = UrlFetchApp.fetch(apiUrl, options); // เปิดการส่งข้อมูลจริง
+          Logger.log("Response from API: " + response.getContentText());
+        } catch (e) {
+          Logger.log("Error: " + e.message);
+        }
+      }
+    }
+  }
+}

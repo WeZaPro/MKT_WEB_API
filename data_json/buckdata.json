@@ -1,0 +1,22 @@
+{
+  "data": [
+    {
+      "product_code": "B001",
+      "product_group": "group_1",
+      "name": "name_A1",
+      "price": "100",
+      "sale": "200",
+      "description": "description_1",
+      "product_image": "buck_A1.jpg"
+    },
+    {
+      "product_code": "B002",
+      "product_group": "group_2",
+      "name": "name_A2",
+      "price": "155",
+      "sale": "355",
+      "description": "description_1",
+      "product_image": "buck_A2.jpg"
+    }
+  ]
+}

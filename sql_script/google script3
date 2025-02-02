@@ -1,0 +1,64 @@
+function main() {
+  var campaignIterator = AdsApp.campaigns()
+    .withCondition('Status = "PAUSED"') // Filter for PAUSED campaigns
+    .forDateRange('LAST_30_DAYS') // Set the date range directly
+    .get();
+  
+  while (campaignIterator.hasNext()) {
+    var campaign = campaignIterator.next();
+    var campaignName = campaign.getName(); // Get campaign name
+    var campaignStatus = campaign.isPaused() ? 'PAUSED' : 'Other'; // Check if campaign is paused
+
+    var adGroupIterator = campaign.adGroups().get();
+    
+    while (adGroupIterator.hasNext()) {
+      var adGroup = adGroupIterator.next();
+      var adGroupName = adGroup.getName(); // Get ad group name
+      var adGroupStatus = adGroup.isPaused() ? 'PAUSED' : 'Other'; // Check if ad group is paused
+
+      var adIterator = adGroup.ads().get();
+      
+      while (adIterator.hasNext()) {
+        var ad = adIterator.next();
+        var adId = ad.getId(); // Get ad ID
+        var adStatus = ad.isPaused() ? 'PAUSED' : 'Other'; // Check if ad is paused
+        
+        var adHeadline = ad.getHeadline(); // Get ad headline
+        var adDescription = 'N/A'; // Default description
+        var adFinalUrl = 'N/A'; // Default final URL
+
+        // Get stats for impressions, clicks, conversions, etc.
+        var stats = ad.getStatsFor('LAST_30_DAYS');
+        var impressions = stats.getImpressions(); // Get total impressions
+        var clicks = stats.getClicks(); // Get total clicks
+        var conversions = stats.getConversions(); // Get total conversions
+        var cost = stats.getCost(); // Get total cost
+        
+        // Calculate CTR (Click-Through Rate)
+        var ctr = (impressions > 0) ? (clicks / impressions) * 100 : 0; // CTR in percentage
+
+        // Get the current week manually based on the date
+        var currentDate = new Date();
+        var startOfYear = new Date(currentDate.getFullYear(), 0, 1);
+        var daysInYear = Math.floor((currentDate - startOfYear) / (1000 * 60 * 60 * 24));
+        var week = Math.ceil(daysInYear / 7); // Get the week number of the year
+
+        Logger.log('Campaign Name: ' + campaignName);
+        Logger.log('Campaign Status: ' + campaignStatus);
+        Logger.log('AdGroup Name: ' + adGroupName);
+        Logger.log('AdGroup Status: ' + adGroupStatus);
+        Logger.log('Ad ID: ' + adId);
+        Logger.log('Ad Status: ' + adStatus);
+        Logger.log('Ad Headline: ' + adHeadline);
+        Logger.log('Ad Description: ' + adDescription);
+        Logger.log('Ad Final URL: ' + adFinalUrl);
+        Logger.log('Impressions: ' + impressions);
+        Logger.log('Clicks: ' + clicks);
+        Logger.log('Conversions: ' + conversions);
+        Logger.log('Cost: ' + cost);
+        Logger.log('CTR: ' + ctr.toFixed(2) + '%'); // Log CTR with 2 decimal places
+        Logger.log('Week: ' + week);
+      }
+    }
+  }
+}

@@ -1,0 +1,68 @@
+function main() {
+  // ดึงข้อมูลจากแคมเปญที่ยังไม่เปิดใช้งาน
+  var campaignIterator = AdsApp.campaigns()
+    .withCondition('Status = "PAUSED"') // Filter for PAUSED campaigns
+    .forDateRange('ALL_TIME') // กำหนดช่วงเวลาล่าสุดที่ต้องการ
+    .get();
+  
+  while (campaignIterator.hasNext()) {
+    var campaign = campaignIterator.next();
+    var campaignName = campaign.getName(); // ชื่อแคมเปญ
+    var campaignStatus = campaign.isPaused() ? 'PAUSED' : 'Other'; // สถานะแคมเปญ
+    
+    var adGroupIterator = campaign.adGroups().get();
+    
+    while (adGroupIterator.hasNext()) {
+      var adGroup = adGroupIterator.next();
+      var adGroupName = adGroup.getName(); // ชื่อกลุ่มโฆษณา
+      var adGroupStatus = adGroup.isPaused() ? 'PAUSED' : 'Other'; // สถานะของกลุ่มโฆษณา
+
+      var adIterator = adGroup.ads().get();
+      
+      while (adIterator.hasNext()) {
+        var ad = adIterator.next();
+        var adId = ad.getId(); // ID ของโฆษณา
+        var adStatus = ad.isPaused() ? 'PAUSED' : 'Other'; // สถานะของโฆษณา
+        
+        var adHeadline = ad.getHeadline(); // หัวข้อโฆษณา
+        var adDescription = 'N/A'; // คำอธิบายโฆษณา
+        var adFinalUrl = 'N/A'; // URL สุดท้าย
+
+        // ดึงข้อมูลสำหรับสถิติ
+        var stats = ad.getStatsFor('LAST_30_DAYS'); // ดึงข้อมูลในช่วง 30 วันที่ผ่านมา
+        var impressions = stats.getImpressions(); // จำนวนการแสดงผล
+        var clicks = stats.getClicks(); // จำนวนคลิก
+        var conversions = stats.getConversions(); // การแปลง
+        var cost = stats.getCost(); // ค่าใช้จ่าย
+
+        // คำนวณ CTR (Click-Through Rate)
+        var ctr = (impressions > 0) ? (clicks / impressions) * 100 : 0; // CTR เปอร์เซ็นต์
+
+         
+        
+        // คำนวณค่าอื่นๆ
+        var conversionRate = conversions / clicks;
+        var costPerConversion = cost / conversions;
+        
+
+        // กำหนดชื่อสัปดาห์
+        var weekRange = "Nov 18, 2024 to Nov 24, 2024 (Week 47)"; // คุณสามารถคำนวณช่วงสัปดาห์ตามวันที่ได้
+
+        // บันทึกข้อมูลลง log หรือส่งออก
+        Logger.log('Campaign Name: ' + campaignName);
+        Logger.log('AdGroup Name: ' + adGroupName);
+        Logger.log('Ad ID: ' + adId);
+        Logger.log('Week: ' + weekRange);
+        Logger.log('Ad Strength: Excellent'); // สมมุติค่าที่ได้จากการวิเคราะห์
+        Logger.log('Clicks: ' + clicks);
+        Logger.log('CTR: ' + ctr.toFixed(2) + '%');
+        Logger.log('Conversion Rate: ' + conversionRate);
+        Logger.log('Impressions: ' + impressions);
+        Logger.log('Cost per Conversion: ' + costPerConversion);
+        Logger.log('Click Conversion Rate: ' + conversionRate);
+        Logger.log('Conversions: ' + conversions);
+        Logger.log('Cost: ' + cost);
+      }
+    }
+  }
+}

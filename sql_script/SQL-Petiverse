@@ -1,0 +1,219 @@
+CREATE DATABASE IF NOT EXISTS PETIVERSE;
+
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(255) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    salt VARCHAR(255) ,
+    phone VARCHAR(255) NOT NULL,
+    type_store VARCHAR(255) NOT NULL,
+    company_name VARCHAR(255) NOT NULL,
+    company_id VARCHAR(255) NOT NULL,
+    isAds BOOLEAN DEFAULT FALSE;
+    isManage BOOLEAN DEFAULT FALSE
+    status BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- form สมัคร
+CREATE TABLE IF NOT EXISTS register_data (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    course VARCHAR(255),
+    lineUserId VARCHAR(255),
+    displayName VARCHAR(255),
+    email VARCHAR(255),
+    phone VARCHAR(50),
+    name VARCHAR(255),
+    date DATETIME,
+    fileName VARCHAR(255),
+    fileUrl VARCHAR(255),
+    price DECIMAL(10, 2)
+);
+
+
+-- Google ads date
+CREATE TABLE sql_table_day_adsId (
+    campaign VARCHAR(255),
+    ad_group VARCHAR(255),
+    ad_id VARCHAR(255),
+    Day VARCHAR(255),
+    ad_strength VARCHAR(50),
+    clicks INT,
+    ctr FLOAT,
+    conv_rate FLOAT,
+    impressions INT,
+    conversions INT,
+    cost FLOAT,
+    impression_absolute_top_percent FLOAT,
+    impression_top_percent FLOAT,
+    cost_per_conv DECIMAL(10, 2),
+    click_conversion_rate FLOAT,
+    cross_device_conv INT,
+    engagements INT
+);
+-- Google ads week / ของเก่า
+CREATE TABLE sql_table_week_adsId (
+    campaign VARCHAR(255),
+    ad_group VARCHAR(255),
+    ad_id VARCHAR(255),
+    week VARCHAR(255),
+    ad_strength VARCHAR(50),
+    clicks INT,
+    ctr FLOAT,
+    conv_rate FLOAT,
+    impressions INT,
+    conversions INT,
+    cost FLOAT,
+    impression_absolute_top_percent FLOAT,
+    impression_top_percent FLOAT,
+    cost_per_conv DECIMAL(10, 2),
+    click_conversion_rate FLOAT,
+    cross_device_conv INT,
+    engagements INT
+);
+
+
+-- Google ads week / ของใหม่
+CREATE TABLE googleAds_data_table (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    CampaignName VARCHAR(255) NOT NULL,
+    AdGroupId INT NOT NULL,
+    AdGroupName VARCHAR(255) NOT NULL,
+    AdId INT NOT NULL,
+    Date DATE NOT NULL,
+    AdStrength VARCHAR(50),
+    Clicks INT DEFAULT 0,
+    Ctr DECIMAL(10, 4) DEFAULT 0.0000,
+    ConvRate DECIMAL(10, 4) DEFAULT 0.0000,
+    Impressions INT DEFAULT 0,
+    Conversions INT DEFAULT 0,
+    Cost DECIMAL(10, 2) DEFAULT 0.00,
+    CostPerConv DECIMAL(10, 2) DEFAULT 0.00
+   
+);
+-- Google ads week / ของใหม่ ใช้ตัวนี้
+CREATE TABLE googleAds_data_company (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    CampaignName VARCHAR(255) NOT NULL,
+    AdGroupId INT NOT NULL,
+    AdGroupName VARCHAR(255) NOT NULL,
+    AdId INT NOT NULL,
+    Date DATE NOT NULL,
+    AdStrength VARCHAR(50),
+    Clicks INT DEFAULT 0,
+    Ctr DECIMAL(10, 4) DEFAULT 0.0000,
+    ConvRate DECIMAL(10, 4) DEFAULT 0.0000,
+    Impressions INT DEFAULT 0,
+    Conversions INT DEFAULT 0,
+    Cost DECIMAL(10, 2) DEFAULT 0.00,
+    CostPerConv DECIMAL(10, 2) DEFAULT 0.00,
+    Keywords VARCHAR(255) NOT NULL,
+    Company VARCHAR(255) NOT NULL
+   
+);
+-- Google ads week / ของใหม่ ใช้ตัวนี้
+CREATE TABLE google_ads_kw_value (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  campaign_name VARCHAR(255),
+  ad_group_name VARCHAR(255),
+  keyword_text TEXT,
+  match_type VARCHAR(50),
+  impressions INT,
+  clicks INT,
+  ctr DECIMAL(5,2),
+  conversions INT,
+  cost DECIMAL(10,2),
+  cost_per_conversion DECIMAL(10,2),
+  company VARCHAR(255),
+  created_at DATE DEFAULT (CURRENT_DATE)
+--   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+
+
+-- management 
+CREATE TABLE products (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    product_code VARCHAR(255) NOT NULL,
+    product_group VARCHAR(255) NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    image VARCHAR(255) NOT NULL,
+    price INT NOT NULL,
+    sale INT NOT NULL,
+    description TEXT,
+    created_by INT NOT NULL,
+    company_id VARCHAR(255) NOT NULL,
+    company_name VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE stock (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    product_id INT NOT NULL,
+    quantity INT NOT NULL,
+    company_id VARCHAR(255) NOT NULL,
+    company_name VARCHAR(255) NOT NULL,
+    last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+);
+
+CREATE TABLE transactions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    product_id INT NOT NULL,
+    user_id INT NOT NULL,
+    company_id VARCHAR(255) NOT NULL,
+    company_name VARCHAR(255) NOT NULL,
+    type ENUM('in', 'out') NOT NULL,
+    quantity INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- management ----- nouse ******
+CREATE TABLE allproducts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    product_code VARCHAR(255) NOT NULL,
+    product_group VARCHAR(255) NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    image VARCHAR(255) NOT NULL,
+    price INT NOT NULL,
+    description TEXT,
+    created_by INT NOT NULL,
+    company_id VARCHAR(255) NOT NULL,
+    company_name VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+
+);
+
+
+CREATE TABLE UserActions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    IP VARCHAR(15) NOT NULL,
+    UI VARCHAR(255) NOT NULL,
+    CLICK VARCHAR(255) NOT NULL,
+    created_at DATETIME DEFAULT NOW() -- เพิ่มคอลัมน์ created_at
+);
+
+
+-- ab test 
+CREATE TABLE abtest (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    switch_page INTEGER NOT NULL DEFAULT 0,
+    mainA INTEGER NOT NULL DEFAULT 0,
+    created_by INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE campaign_data (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    CampaignName VARCHAR(255) NOT NULL,
+    Clicks INT NOT NULL,
+    Impressions INT NOT NULL,
+    Cost DECIMAL(10,2) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

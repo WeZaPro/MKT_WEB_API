@@ -1,0 +1,17 @@
+CREATE TABLE sql_table_week_adgroup(
+    campaign VARCHAR(255),
+    ad_group VARCHAR(255),
+    week VARCHAR(255),
+    ad_strength VARCHAR(50),
+    clicks INT,
+    ctr FLOAT,
+    conv_rate FLOAT,
+    impressions INT,
+    conversions INT,
+    impression_absolute_top_percent FLOAT,
+    impression_top_percent FLOAT,
+    cost_per_conv DECIMAL(10, 2),
+    click_conversion_rate FLOAT,
+    cross_device_conv INT,
+    engagements INT
+);

@@ -1,0 +1,68 @@
+function main() {
+  var today = new Date();
+  var firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+  var lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+
+  var startDate = Utilities.formatDate(firstDayOfMonth, "Asia/Bangkok", "yyyyMMdd");
+  var endDate = Utilities.formatDate(lastDayOfMonth, "Asia/Bangkok", "yyyyMMdd");
+
+  var campaignIterator = AdsApp.campaigns()
+    .withCondition('Status = "PAUSED"') // ดึงเฉพาะแคมเปญที่หยุดไว้
+    .forDateRange(startDate, endDate)
+    .get();
+
+  var dataToSend = [];
+
+  while (campaignIterator.hasNext()) {
+    var campaign = campaignIterator.next();
+    var campaignName = campaign.getName();
+
+    var adGroupIterator = campaign.adGroups().get();
+    
+    while (adGroupIterator.hasNext()) {
+      var adGroup = adGroupIterator.next();
+      var adGroupName = adGroup.getName();
+
+      // ดึง Keyword ที่อยู่ใน Ad Group
+      var keywordIterator = adGroup.keywords().get();
+      while (keywordIterator.hasNext()) {
+        var keyword = keywordIterator.next();
+        var keywordText = keyword.getText(); // ข้อความของคีย์เวิร์ด
+        
+        // ดึงข้อมูลสถิติของ Keyword
+        var stats = keyword.getStatsFor(startDate, endDate);
+        var impressions = stats.getImpressions();
+        var clicks = stats.getClicks();
+        var conversions = stats.getConversions();
+        var cost = stats.getCost();
+        var ctr = impressions > 0 ? (clicks / impressions) * 100 : 0;
+        var conversionRate = clicks > 0 ? (conversions / clicks) : 0;
+        var costPerConversion = conversions > 0 ? (cost / conversions) : 0;
+
+        // สร้างข้อมูลเพื่อส่งไปยัง API
+        dataToSend.push({
+          campaignName: campaignName,
+          adGroupName: adGroupName,
+          keywordText: keywordText,
+          impressions: impressions,
+          clicks: clicks,
+          ctr: ctr,
+          conversions: conversions,
+          cost: cost,
+          costPerConversion: costPerConversion
+        });
+      }
+    }
+  }
+
+  // ส่งข้อมูลไปยัง API
+  var url = "https://app.wezaapidev.com/googleAdsKeywordValue?company=A"; // URL ของ Node.js API ที่จะรับข้อมูล
+  var options = {
+    method: "POST",
+    contentType: "application/json",
+    payload: JSON.stringify({ data: dataToSend })
+  };
+  
+  var response = UrlFetchApp.fetch(url, options);
+  Logger.log("Response from API: " + response.getContentText());
+}

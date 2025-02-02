@@ -1,0 +1,77 @@
+function main() {
+  // คำนวณวันที่เริ่มต้นและสิ้นสุดของเดือนนี้
+  var today = new Date();
+  var firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1); // วันที่ 1 ของเดือนนี้
+  var lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0); // วันที่สุดท้ายของเดือนนี้
+  
+  // เปลี่ยนวันที่ให้เป็นรูปแบบ YYYYMMDD
+  var startDate = Utilities.formatDate(firstDayOfMonth, "Asia/Bangkok", "yyyyMMdd");
+  var endDate = Utilities.formatDate(lastDayOfMonth, "Asia/Bangkok", "yyyyMMdd");
+
+  // ใช้ AdsApp เพื่อดึงข้อมูลแคมเปญตามช่วงวันที่
+  var campaignIterator = AdsApp.campaigns()
+    .withCondition('Status = "PAUSED"') // แสดงเฉพาะแคมเปญที่ถูกหยุด
+    .forDateRange(startDate, endDate) // กำหนดช่วงเวลาที่ต้องการ
+    .get();
+  
+  while (campaignIterator.hasNext()) {
+    var campaign = campaignIterator.next();
+    var campaignName = campaign.getName(); // ชื่อแคมเปญ
+    var campaignStatus = campaign.isPaused() ? 'PAUSED' : 'Other'; // สถานะแคมเปญ
+    
+    var adGroupIterator = campaign.adGroups().get();
+    
+    while (adGroupIterator.hasNext()) {
+      var adGroup = adGroupIterator.next();
+      var adGroupName = adGroup.getName(); // ชื่อกลุ่มโฆษณา
+      var adGroupStatus = adGroup.isPaused() ? 'PAUSED' : 'Other'; // สถานะของกลุ่มโฆษณา
+
+      var adIterator = adGroup.ads().get();
+      
+      while (adIterator.hasNext()) {
+        var ad = adIterator.next();
+        var adId = ad.getId(); // ID ของโฆษณา
+        var adStatus = ad.isPaused() ? 'PAUSED' : 'Other'; // สถานะของโฆษณา
+        
+        var adHeadline = ad.getHeadline(); // หัวข้อโฆษณา
+        var adDescription = 'N/A'; // คำอธิบายโฆษณา
+        var adFinalUrl = 'N/A'; // URL สุดท้าย
+
+        // ดึงข้อมูลสำหรับสถิติในช่วงเวลาที่กำหนด
+        var stats = ad.getStatsFor(startDate, endDate); // ดึงข้อมูลตามช่วงเวลาที่กำหนด
+        var impressions = stats.getImpressions(); // จำนวนการแสดงผล
+        var clicks = stats.getClicks(); // จำนวนคลิก
+        var conversions = stats.getConversions(); // การแปลง
+        var cost = stats.getCost(); // ค่าใช้จ่าย
+
+        // คำนวณ CTR (Click-Through Rate)
+        var ctr = (impressions > 0) ? (clicks / impressions) * 100 : 0; // CTR เปอร์เซ็นต์
+
+        // คำนวณค่าอื่นๆ
+        var conversionRate = conversions / clicks;
+        var costPerConversion = cost / conversions;
+
+        // การวนลูปตามวันที่ภายในช่วงที่กำหนด (จากวันที่ 1 ถึงวันที่สุดท้ายของเดือนนี้)
+        var currentDate = new Date(firstDayOfMonth); // วันที่เริ่มต้น
+        while (currentDate <= lastDayOfMonth) {
+          var formattedDate = Utilities.formatDate(currentDate, "Asia/Bangkok", "yyyyMMdd");
+          
+          // บันทึกข้อมูลลง log หรือส่งออก
+          Logger.log('Campaign Name: ' + campaignName);
+          Logger.log('AdGroup Name: ' + adGroupName);
+          Logger.log('Ad ID: ' + adId);
+          Logger.log('Date: ' + formattedDate); // แสดงวันที่ที่ดึงข้อมูล
+          Logger.log('CTR: ' + ctr.toFixed(2) + '%');
+          Logger.log('Conversion Rate: ' + conversionRate);
+          Logger.log('Impressions: ' + impressions);
+          Logger.log('Cost per Conversion: ' + costPerConversion);
+          Logger.log('Conversions: ' + conversions);
+          Logger.log('Cost: ' + cost);
+
+          // ไปยังวันที่ถัดไป
+          currentDate.setDate(currentDate.getDate() + 1);
+        }
+      }
+    }
+  }
+}

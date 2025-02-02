@@ -1,0 +1,57 @@
+function main() {
+  var campaignIterator = AdsApp.campaigns()
+    .withCondition('Status = "PAUSED"') // Filter for PAUSED campaigns
+    .forDateRange('ALL_TIME')
+    .get();
+  
+  while (campaignIterator.hasNext()) {
+    var campaign = campaignIterator.next();
+    var campaignName = campaign.getName(); // Get campaign name
+    var campaignStatus = campaign.isPaused() ? 'PAUSED' : 'Other'; // Check if campaign is paused
+
+    var adGroupIterator = campaign.adGroups().get();
+    
+    while (adGroupIterator.hasNext()) {
+      var adGroup = adGroupIterator.next();
+      var adGroupName = adGroup.getName(); // Get ad group name
+      var adGroupStatus = adGroup.isPaused() ? 'PAUSED' : 'Other'; // Check if ad group is paused
+
+      var adIterator = adGroup.ads().get();
+      
+      while (adIterator.hasNext()) {
+        var ad = adIterator.next();
+        var adId = ad.getId(); // Get ad ID
+        var adStatus = ad.isPaused() ? 'PAUSED' : 'Other'; // Check if ad is paused
+        
+        var adHeadline = ad.getHeadline(); // Get ad headline
+        var adDescription = 'N/A'; // Default description
+        var adFinalUrl = 'N/A'; // Default final URL
+        
+        // Check if the ad is a text ad
+        if (ad.isType().TEXT_AD) {
+          adDescription = ad.getDescription(); // Get ad description for Text Ads
+          adFinalUrl = ad.getFinalUrl(); // Get final URL for Text Ads
+        }
+        
+        // Check if the ad is a responsive search ad
+        if (ad.isType().RESPONSIVE_SEARCH_AD) {
+          adDescription = ad.getDescription(); // Get description for Responsive Search Ads
+          adFinalUrl = ad.getFinalUrl(); // Get final URL for Responsive Search Ads
+        }
+
+        Logger.log('Campaign Name: ' + campaignName);
+        Logger.log('Campaign Status: ' + campaignStatus);
+        Logger.log('AdGroup Name: ' + adGroupName);
+        Logger.log('AdGroup Status: ' + adGroupStatus);
+        Logger.log('Ad ID: ' + adId);
+        Logger.log('Ad Status: ' + adStatus);
+        Logger.log('Ad Headline: ' + adHeadline);
+        Logger.log('Ad Description: ' + adDescription);
+        Logger.log('Ad Final URL: ' + adFinalUrl);
+        Logger.log('Clicks: ' + ad.getStatsFor('LAST_30_DAYS').getClicks());
+        Logger.log('Impressions: ' + ad.getStatsFor('LAST_30_DAYS').getImpressions());
+        Logger.log('Cost: ' + ad.getStatsFor('LAST_30_DAYS').getCost());
+      }
+    }
+  }
+}
