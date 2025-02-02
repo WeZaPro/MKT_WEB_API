@@ -310,6 +310,10 @@ app.post(
   "/getGoogleAdsKeywordValueFilterCam",
   controllerGoogleAds_update.getGoogleAdsKeywordValueFilterCam
 );
+app.post(
+  "/getGoogleAdsKewwordTotal",
+  controllerGoogleAds_update.getGoogleAdsKewwordTotal
+);
 
 //-------Google ads ************** end
 //

@@ -475,6 +475,122 @@ exports.getGoogleAdsKeywordValueFilterCam = async (req, res) => {
   }
 };
 
+exports.getGoogleAdsKewwordTotal = async (req, res) => {
+  const company = req.query.company || "Unknown";
+  const { campaign_name, startDate, endDate } = req.body;
+
+  // console.log("company ", company);
+  // console.log("campaign_name ", campaign_name);
+  // console.log("startDate ", startDate);
+  // console.log("endDate ", endDate);
+
+  if (!company) {
+    return res
+      .status(400)
+      .json({ error: "Missing required parameter: company" });
+  }
+
+  const seq_table = "google_ads_kw_value"; // Table name
+
+  // Create MySQL connection
+  const db_googleAdsData_two = await mysql.createConnection({
+    host: process.env.host,
+    user: process.env.user,
+    password: process.env.password,
+    database: process.env.database,
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0,
+  });
+
+  let query = `SELECT * FROM ${seq_table} WHERE company = ?`;
+  let queryParams = [company];
+
+  // Adding filters for campaign_name, startDate, endDate
+  if (campaign_name) {
+    query += ` AND campaign_name LIKE ?`;
+    queryParams.push(`%${campaign_name}%`);
+  }
+
+  if (startDate) {
+    query += ` AND created_at >= ?`;
+    queryParams.push(startDate);
+  }
+
+  if (endDate) {
+    query += ` AND created_at <= ?`;
+    queryParams.push(endDate);
+  }
+
+  console.log("query ", query);
+  console.log("queryParams ", queryParams);
+  try {
+    // Execute query
+    const [rows] = await db_googleAdsData_two.query(query, queryParams);
+    console.log("rows ", rows);
+
+    // ✅ Close the DB connection
+    await db_googleAdsData_two.end();
+
+    if (rows.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No data found for the given filters" });
+    }
+
+    // Format the created_at field
+    rows.forEach((row) => {
+      row.created_at = format(new Date(row.created_at), "yyyy-MM-dd");
+    });
+
+    // Group the data by campaign_name, ad_group_name, and keyword_text
+    const groupedData = rows.reduce((acc, row) => {
+      const key = `${row.campaign_name}_${row.ad_group_name}_${row.keyword_text}`;
+
+      if (!acc[key]) {
+        acc[key] = {
+          campaign_name: row.campaign_name,
+          ad_group_name: row.ad_group_name,
+          keyword_text: row.keyword_text,
+          match_type: row.match_type,
+          impressions: 0,
+          clicks: 0,
+          conversions: 0,
+          ctr: 0,
+          cost: 0,
+          count: 0,
+        };
+      }
+
+      acc[key].impressions += row.impressions;
+      acc[key].clicks += row.clicks;
+      acc[key].conversions += row.conversions;
+      acc[key].cost += parseFloat(row.cost);
+      acc[key].count++;
+
+      return acc;
+    }, {});
+
+    // Transform the grouped data into the desired output format
+    const result = Object.values(groupedData).map((item) => ({
+      campaign_name: item.campaign_name,
+      ad_group_name: item.ad_group_name,
+      keyword_text: item.keyword_text,
+      match_type: item.match_type,
+      avg_impressions: item.impressions / item.count,
+      avg_clicks: item.clicks / item.count,
+      avg_conversions: item.conversions / item.count,
+      avg_ctr: item.clicks / item.impressions, // CTR = Clicks / Impressions
+      sum_cost: item.cost,
+    }));
+
+    res.json({ data: result });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ message: "An error occurred" });
+  }
+};
+
 exports.listCampaignsUpdate = async (req, res) => {
   // const tableName = "googleAds_data_company";
   const company = req.query.company || "Unknown";
