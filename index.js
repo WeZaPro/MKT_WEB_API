@@ -311,8 +311,8 @@ app.post(
   controllerGoogleAds_update.getGoogleAdsKeywordValueFilterCam
 );
 app.post(
-  "/getGoogleAdsKewwordTotal",
-  controllerGoogleAds_update.getGoogleAdsKewwordTotal
+  "/getGoogleAdsKeywordTotal",
+  controllerGoogleAds_update.getGoogleAdsKeywordTotal
 );
 
 //-------Google ads ************** end

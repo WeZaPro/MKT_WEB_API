@@ -475,7 +475,7 @@ exports.getGoogleAdsKeywordValueFilterCam = async (req, res) => {
   }
 };
 
-exports.getGoogleAdsKewwordTotal = async (req, res) => {
+exports.getGoogleAdsKeywordTotal = async (req, res) => {
   const company = req.query.company || "Unknown";
   const { campaign_name, startDate, endDate } = req.body;
 
