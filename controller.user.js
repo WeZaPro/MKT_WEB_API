@@ -235,14 +235,23 @@ exports.user = async (req, res) => {
 };
 
 exports.register_notFile = async (req, res) => {
-  const { date, name, phone, email, displayName, lineUserId, course, price } =
-    req.body;
+  const {
+    date,
+    name,
+    message,
+    phone,
+    email,
+    displayName,
+    lineUserId,
+    course,
+    price,
+  } = req.body;
   // console.log("req.body ", req.body);
   try {
     const data_register_free = {
       fileUrl: "no",
       fileName: "no",
-      date: req.body.date,
+      message: req.body.message,
       name: req.body.name,
       phone: req.body.phone,
       email: req.body.email,
@@ -260,7 +269,8 @@ exports.register_notFile = async (req, res) => {
         data_register_free.email,
         data_register_free.phone,
         data_register_free.name,
-        data_register_free.date,
+        data_register_free.message,
+        // data_register_free.date,
         data_register_free.fileName,
         data_register_free.fileUrl,
         data_register_free.price,
@@ -271,15 +281,23 @@ exports.register_notFile = async (req, res) => {
     await appendDataToMySql(register_data_free);
 
     // สร้างข้อความสำหรับส่ง
+    //   const message_noimage = `
+    //   📌 รายละเอียดการลงทะเบียน:
+    //   ชื่อ: ${name}
+    //   อีเมล: ${email}
+    //   เบอร์โทร: ${phone}
+    //   หลักสูตร: ${course}
+    //   วันที่: ${date}
+    //   ราคา: 0
+
+    // `;
+
     const message_noimage = `
     📌 รายละเอียดการลงทะเบียน:
     ชื่อ: ${name}
     อีเมล: ${email}
     เบอร์โทร: ${phone}
-    หลักสูตร: ${course}
-    วันที่: ${date}
-    ราคา: 0
-   
+    message: ${message}
   `;
 
     //line
@@ -389,8 +407,8 @@ function appendDataToMySql(data) {
     }
     const query = `
     INSERT INTO register_data (
-      course, lineUserId, displayName, email, phone, name, date, fileName, fileUrl, price
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+      course, lineUserId, displayName, email, phone, name,message, fileName, fileUrl, price
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,  ?);
   `;
 
     // ใช้ `Promise` เพื่อทำให้โค้ดรองรับ async/await

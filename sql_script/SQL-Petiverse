@@ -24,7 +24,8 @@ CREATE TABLE IF NOT EXISTS register_data (
     email VARCHAR(255),
     phone VARCHAR(50),
     name VARCHAR(255),
-    date DATETIME,
+    message VARCHAR(255),
+    date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     fileName VARCHAR(255),
     fileUrl VARCHAR(255),
     price DECIMAL(10, 2)
