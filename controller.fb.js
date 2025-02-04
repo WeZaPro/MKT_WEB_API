@@ -5,7 +5,7 @@ const cors = require("cors");
 const app = express();
 const PORT = 3000;
 const adAccountId = process.env.facebook_acc_id;
-const accessToken = process.env.channelAccessToken;
+const accessToken = process.env.channelAccessToken_facebook;
 const fb_fields =
   "campaign_name,adset_name,adset_id,ad_name,ad_id,reach, impressions,clicks,cpm,cpc,ctr,frequency,actions, conversions,spend";
 
@@ -137,12 +137,14 @@ exports.GetFbActionByAdsSet = async (req, res) => {
     const data = await getDailyAdInsights(startDate, endDate, status);
 
     const filteredData = filterActionByAdsSet(data.data, adset_name);
+
     // console.log(">>>>>> filteredData >>>>>> ", filteredData);
 
     const filter_separeate_adName = separeate_action_adSet_Name(
       filteredData,
       adset_name
     );
+
     // console.log("filter_separeate_adName ====> ", filter_separeate_adName);
     // console.log(
     //   ">>>>>> filter_separeate_adName >>>>>> ",
@@ -292,7 +294,7 @@ async function getDailyAdInsights(startDate, endDate, status) {
         },
       }
     );
-    // console.log("response.data ", response.data);
+
     return response.data;
   } catch (error) {
     console.error(
@@ -571,6 +573,7 @@ const separeate_action_adSet_Name = (inputData, adset_name) => {
   const _formatActionData = formatActionData(arr_actions);
   // console.log("_formatActionData ", _formatActionData);
   // return arr_actions;
+
   return _formatActionData;
 };
 
@@ -624,6 +627,7 @@ const formatActionData = (inputData) => {
     existingAd.spend.push(parseFloat(parseFloat(item.spend).toFixed(2))); // เปลี่ยนค่าของ clicks เป็นตัวเลข
     existingAd.cpm.push(parseFloat(parseFloat(item.cpm).toFixed(2))); // เปลี่ยนค่าของ clicks เป็นตัวเลข
     existingAd.cpc.push(parseFloat(parseFloat(item.cpc).toFixed(2))); // เปลี่ยนค่าของ clicks เป็นตัวเลข
+    // existingAd.ctr.push(parseFloat(parseFloat(item.ctr * 100).toFixed(2)));
     existingAd.ctr.push(parseFloat(parseFloat(item.ctr * 100).toFixed(2)));
     // เปลี่ยนค่าของ clicks เป็นตัวเลข
     existingAd.frequency.push(

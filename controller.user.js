@@ -447,10 +447,15 @@ async function appendDataSaveFileToMySql(data) {
 const line_Oa_uid = process.env.line_Oa_uid;
 const config = {
   channelAccessToken: process.env.channelAccessToken, // แทนที่ด้วย Channel Access Token
-  channelSecret: process.env.channelSecret, // แทนที่ด้วย Channel Secret
+  channelSecret: process.env.channelSecret, // แทนที่ด้วย Channel Secret//
+  // channelAccessToken:
+  //   "gYs1BGtt1BqtdjNtMNDHEVCw/UZm6gRsisWY3b3vNFzs2PppHNMUMvb4h9KIzvIEco7EgKK2Pip86q52zMn8t1CNqAq+pofA3le3t0WmJsWraBYjnokLlWlOda2q/iRFQi7OdtvuF2vWbESMN3OSLAdB04t89/1O/w1cDnyilFU=",
+  // channelSecret: "066c773739e78a25b5accfb2ac49dda7", // แทนที่ด้วย Channel Secret//
 };
 const client = new line.Client(config);
 const sendToLineOA = async (userId, message, imageUrl = null) => {
+  console.log("userId ", userId);
+  console.log("message ", message);
   try {
     const messages = [
       {
