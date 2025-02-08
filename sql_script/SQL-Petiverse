@@ -220,7 +220,7 @@ CREATE TABLE campaign_data (
 );
 
 
-CREATE TABLE lineUsers (
+CREATE TABLE lineUser (
     user_id VARCHAR(50) PRIMARY KEY,
     display_name VARCHAR(100),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
