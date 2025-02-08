@@ -395,7 +395,7 @@ app.get(
 );
 
 //Webhook linebot
-app.get("/webhook", controllerLineBot.lineBot);
+app.post("/webhook", controllerLineBot.lineBot);
 
 app.get("/GetDataAdsGroupDate", controllerGoogleAds.GetDataAdsGroupDate);
 app.get(
