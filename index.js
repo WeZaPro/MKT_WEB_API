@@ -15,6 +15,7 @@ require("dotenv").config();
 const jwt = require("jsonwebtoken");
 
 const controllerUser = require("./controller.user");
+const controllerLineBot = require("./controller.webhook");
 const controllerReport = require("./controller.reports");
 const controllerGoogleAds = require("./controller.googleads");
 const controllerGoogleAds_update = require("./controller.googleads_update");
@@ -392,47 +393,9 @@ app.get(
   [authenticateToken, checkStatus],
   controllerManagement.getAllStock
 );
-// post productall -OK
-// get productall -OK
-// add product -OK
 
-// get product by product Id / by createby_id -OK
-// edit product by product Id / by createby_id -OK
-// delete product byId by product Id / by createby_id -OK
-// delete product shopId
-
-// stock - getStock -OK
-// transaction - getTransaction -OK
-// transaction IN/OUT , IN=AddStock -OK
-// order
-
-// app.get("/test-image", (req, res) => {
-//   res.sendFile(path.join(__dirname, "productsImage", "image1.jpg"));
-// });
-// Management ************** end
-
-//
-//TODO -USE -end
-//------HOLD-----
-
-//---AB TEST
-// app.put(
-//   "/abTesting",
-//   [authenticateToken, checkStatus],
-//   controllerGoogleAds.updateAbTesting
-// );
-// app.post(
-//   "/abTesting",
-//   [authenticateToken, checkStatus],
-//   controllerGoogleAds.addAbTesting
-// );
-
-// app.get(
-//   "/abTesting",
-//   [authenticateToken, checkStatus],
-//   controllerGoogleAds.getAbTesting
-// );
-//---AB TEST END
+//Webhook linebot
+app.get("/webhook", controllerLineBot.lineBot);
 
 app.get("/GetDataAdsGroupDate", controllerGoogleAds.GetDataAdsGroupDate);
 app.get(
